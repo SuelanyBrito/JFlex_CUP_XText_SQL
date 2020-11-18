@@ -1,0 +1,1770 @@
+package codigo;
+import static codigo.Token.*;
+import static codigo.TokenType.*;
+import java_cup.runtime.Symbol;
+
+%%
+%cup
+%public
+%class SqlLexer
+%extends DefaultJFlexLexer
+%final
+%unicode
+%char
+%type java_cup.runtime.Symbol
+%caseless
+
+%{
+	Token tok;
+
+        private Symbol symbol(int type) {
+            return new Symbol(type, yyline, yycolumn);
+        }
+        private Symbol symbol(int type, Object value) {
+           return new Symbol(type, yyline, yycolumn, value);
+        }
+        
+        public SqlLexer() {
+            super();
+        }
+
+        public Token yylex(){
+            return tok;
+        }
+
+        @Override
+        public int yychar() {
+            return yychar;
+        }
+
+%}
+
+%eofval{
+    return Symbol(sym.EOF, new String("FIM DO ARQUIVO"));
+%eofval}
+
+/* main character classes */
+LineTerminator = \r|\n|\r\n
+InputCharacter = [^\r\n]
+
+WhiteSpace = {LineTerminator} | [ \t\f]
+
+/* comments */
+Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
+
+TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+DocumentationComment = "/**" {CommentContent} "*"+ "/"
+CommentContent       = ( [^*] | \*+ [^/*] )*
+EndOfLineComment = "--" {InputCharacter}* {LineTerminator}?
+
+/* identifiers */
+Identifier = [:jletter:][:jletterdigit:]*
+
+/* integer literals */
+DecIntegerLiteral = 0 | [1-9][0-9]*
+
+/* floating point literals */
+FloatLiteral  = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [fF]
+
+FLit1    = [0-9]+ \. [0-9]*
+FLit2    = \. [0-9]+
+FLit3    = [0-9]+
+Exponent = [eE] [+-]? [0-9]+
+
+/* string and character literals */
+StringCharacter = [^\r\n\"\\]
+SingleCharacter = [^\r\n\'\\]
+
+%state DQ_STRING, SQ_STRING
+Reserved =
+    "ABORT"             |
+    "ABS"               |
+    "ACCESS"            |
+    "ACCESSED"          |
+    "ACCOUNT"           |
+    "ACL"               |
+    "ACOS"              |
+    "ACTION"            |
+    "ACTIONS"           |
+    "ACTIVATE"          |
+    "ACTIVE"            |
+    "ACTIVITY"          |
+    "ADAPTIVE_PLAN"     |
+    "ADD"               |
+    "ADD_COLUMN"        |
+    "ADD_GROUP"         |
+    "ADD_MONTHS"        |
+    "ADJ_DATE"          |
+    "ADMIN"             |
+    "ADMINISTER"        |
+    "ADMINISTRATOR"     |
+    "ADVANCED"          |
+    "ADVISE"            |
+    "ADVISOR"           |
+    "AFD_DISKSTRING"    |
+    "AFTER"             |
+    "AGENT"             |
+    "AGGREGATE"         |
+    "A_LETTER"          |
+    "ALIAS"             |
+    "ALL"               |
+    "ALLOCATE"          |
+    "ALLOW"             |
+    "ALL_ROWS"          |
+    "ALTER"             |
+    "ALWAYS"            |
+    "ANALYZE"           |
+    "ANCILLARY"         |
+    "AND"               |
+    "AND_EQUAL"         |
+    "ANOMALY"           |
+    "ANSI_REARCH"       |
+    "ANTIJOIN"          |
+    "ANY"               |
+    "ANYSCHEMA"         |
+    "APPEND"            |
+    "APPENDCHILDXML"        |
+    "APPEND_VALUES"         |
+    "APPLICATION"           |
+    "APPLY"           |
+    "APPROX_COUNT_DISTINCT"           |
+    "ARCHIVAL"        |
+    "ARCHIVE"         |
+    "ARCHIVED"        |
+    "ARCHIVELOG"      |
+    "ARRAY"           |
+    "AS"              |
+    "ASC"             |
+    "ASCII"           |
+    "ASCIISTR"        |
+    "ASIN"            |
+    "ASIS"            |
+    "ASSEMBLY"        |
+    "ASSIGN"          |
+    "ASSOCIATE"       |
+    "ASYNC"           |
+    "ASYNCHRONOUS"    |
+    "ATAN2"           |
+    "ATAN"            |
+    "AT"               |
+    "ATTRIBUTE"           |
+    "ATTRIBUTES"           |
+    "AUDIT"            |
+    "AUTHENTICATED"           |
+    "AUTHENTICATION"           |
+    "AUTHID"           |
+    "AUTHORIZATION"           |
+    "AUTOALLOCATE"        |
+    "AUTO"         |
+    "AUTOBACKUP"            |
+    "AUTOEXTEND"           |
+    "AUTO_LOGIN"        |
+    "AUTOMATIC"            |
+    "AUTONOMOUS_TRANSACTION"        |
+    "AUTO_REOPTIMIZE"          |
+    "AVAILABILITY"           |
+    "AVRO"                   |
+    "BACKGROUND"           |
+    "BACKUP"          |
+    "BACKUPSET"        |
+    "BASIC"              |
+    "BASICFILE"        |
+    "BATCH"         |
+    "BATCHSIZE"           |
+    "BATCH_TABLE_ACCESS_BY_ROWID"      |
+    "BECOME"         |
+    "BEFORE"        |
+    "BEGIN"              |
+    "BEGINNING"        |
+    "BEGIN_OUTLINE_DATA"           |
+    "BEHALF"           |
+    "BEQUEATH"        |
+    "BETWEEN"          |
+    "BFILE"            |
+    "BFILENAME"        |
+    "BIGFILE"          |
+    "BINARY"         |
+    "BINARY_DOUBLE"            |
+    "BINARY_DOUBLE_INFINITY"        |
+    "BINARY_DOUBLE_NAN"              |
+    "BINARY_FLOAT"               |
+    "BINARY_FLOAT_INFINITY"          |
+    "BINARY_FLOAT_NAN"              |
+    "BINARY_INTEGER"         |
+    "BIND_AWARE"          |
+    "BINDING"            |
+    "BIN_TO_NUM"            |
+    "BITAND"             |
+    "BITMAP_AND"        |
+    "BITMAP"            |
+    "BITMAPS"          |
+    "BITMAP_TREE"        |
+    "BITS"              |
+    "BLOB"            |
+    "BLOCK"              |
+    "BLOCK_RANGE"       |
+    "BLOCKS"             |
+    "BLOCKSIZE"         |
+    "BODY"            |
+    "BOOLEAN"        |
+    "BOTH"           |
+    "BOUND"         |
+    "BRANCH"            |
+    "BREADTH"         |
+    "BROADCAST"          |
+    "BSON"           |
+    "BUFFER"               |
+    "BUFFER_CACHE"        |
+    "BUFFER_POOL"         |
+    "BUILD"          |
+    "BULK"                 |
+    "BY"                |
+    "BYPASS_RECURSIVE_CHECK"           |
+    "BYPASS_UJVC"                |
+    "BYTE"                |
+    "CACHE"           |
+    "CACHE_CB"                |
+    "CACHE_INSTANCES"        |
+    "CACHE_TEMP_TABLE"        |
+    "CACHING"             |
+    "CALCULATED"           |
+    "CALLBACK"            |
+    "CALL"                  |
+    "CANCEL"                  |
+    "CANONICAL"               |
+    "CAPACITY"                |
+    "CARDINALITY"             |
+    "CASCADE"                 |
+    "CASE"                    |
+    "CAST"                    |
+    "CATEGORY"                |
+    "CDBDEFAULT"              |
+    "CEIL"                    |
+    "CELL_FLASH_CACHE"        |
+    "CERTIFICATE"             |
+    "CFILE"                   |
+    "CHAINED"                 |
+    "CHANGE"                  |
+    "CHANGETRACKING"                |
+    "CHANGE_DUPKEY_ERROR_INDEX"              |
+    "CHARACTER"               |
+    "CHAR"                    |
+    "CHAR_CS"                 |
+    "CHARTOROWID"                |
+    "CHECK_ACL_REWRITE"            |
+    "CHECK"                   |
+    "CHECKPOINT"              |
+    "CHILD"                   |
+    "CHOOSE"                  |
+    "CHR"                     |
+    "CHUNK"                   |
+    "CLASS"                   |
+    "CLASSIFIER"             |
+    "CLEANUP"                 |
+    "CLEAR"                   |
+    "C_LETTER"                |
+    "CLIENT"                  |
+    "CLOB"                   |
+    "CLONE"                   |
+    "CLOSE_CACHED_OPEN_CURSORS"       |
+    "CLOSE"                             |
+    "CLUSTER_BY_ROWID"                  |
+    "CLUSTER"                 |
+    "CLUSTER_DETAILS"                 |
+    "CLUSTER_DISTANCE"              |
+    "CLUSTER_ID"                  |
+    "CLUSTERING"                  |
+    "CLUSTERING_FACTOR"        |
+    "CLUSTER_PROBABILITY"           |
+    "CLUSTER_SET"             |
+    "COALESCE"               |
+    "COALESCE_SQ"              |
+    "COARSE"                  |
+    "CO_AUTH_IND"              |
+    "COLD"                    |
+    "COLLECT"                |
+    "COLUMNAR"               |
+    "COLUMN_AUTH_INDICATOR"            |
+    "COLUMN"               |
+    "COLUMNS"                |
+    "COLUMN_STATS"              |
+    "COLUMN_VALUE"                 |
+    "COMMENT"                      |
+    "COMMIT"                      |
+    "COMMITTE"                    |
+    "COMMON_DATA"                  |
+    "COMPACT"                      |
+    "COMPATIBILITY"                |
+    "COMPILE"                      |
+    "COMPLETE"                     |
+    "COMPLIANCE"                   |
+    "COMPONENT"                    |
+    "COMPONENTS"                   |
+    "COMPOSE"                      |
+    "COMPOSITE"                    |
+    "COMPOSITE_LIMIT"              |
+    "COMPOUND"                     |
+    "COMPRESS"                     |
+    "COMPUTE"                      |
+    "CONCAT"                       |
+    "CON_DBID_TO_ID"               |
+    "CONDITIONAL"                  |
+    "CONDITION"                    |
+    "CONFIRM"                      |
+    "CONFORMING"                   |
+    "CONNECT"                      |
+    "CONNECT_TIME"                 |
+    "CONSIDER"                     |
+    "CONSISTENT"                   |
+    "CONSTANT"                     |
+    "CONST"                   |
+    "CONSTRAINT"                  |
+    "CONSTRAINTS"                  |
+    "CONSTRUCTOR"                  |
+    "CONTAINER"                    |
+    "CONTAINER_DATA"               |
+    "CONTAINERS"                   |
+    "CONTENT"                      |
+    "CONTENTS"                     |
+    "CONTEXT"                      |
+    "CONTINUE"                     |
+    "CONTROLFILE"                  |
+    "CON_UID_TO_ID"                |
+    "CONVERT"                     |
+    "COOKIE"                      |
+    "COPY"                        |
+    "COS"                        |
+    "COSH"                        |
+    "COST"                       |
+    "COST_XML_QUERY_REWRITE"            |
+    "COUNT"                   |
+    "COVAR_POP"                  |
+    "COVAR_SAMP"                 |
+    "CPU_COSTING"                |
+    "CPU_PER_CALL"                |
+    "CPU_PER_SESSION"             |
+    "CRASH"                      |
+    "CREATE"                      |
+    "CREATE_FILE_DEST"                |
+    "CREATE_STORED_OUTLINES"          |
+    "CREATION"                   |
+    "CREDENTIAL"                  |
+    "CRITICAL"                    |
+    "CROSS"                       |
+    "CROSSEDITION"                |
+    "CSCONVERT"                   |
+    "CUBE"                       |
+    "CURRENT"                     |
+    "CURRENT_DATE"             |
+    "CURRENT_SCHEMA"              |
+    "CURRENT_TIME"                |
+    "CURRENT_TIMESTAMP"           |
+    "CURRENT_USER"                |
+    "CURRENTV"                    |
+    "CURSOR"                      |
+    "CURSOR_SHARING_EXACT"             |
+    "CURSOR_SPECIFIC_SEGMENT"          | 
+    "CUSTOMDATUM"                 |
+    "CV"                          |
+    "CYCLE"                       |
+    "DANGLING"                    |
+    "DATABASE"                    |
+    "DATA"                        |
+    "DATAFILE"                    |
+    "DATAFILES"                   |
+    "DATAGUARDCONFIG"             |
+    "DATAMOVEMENT"                |
+    "DATAOBJNO"                   |
+    "DATAPUMP"                   |
+    "DATA_SECURITY_REWRITE_LIMIT"       |
+    "DATE"                   |
+    "DATE_MODE"              |
+    "DAY"                  |
+    "DAYS"                   |
+    "DBA"                    |
+    "DBA_RECYCLEBIN"            |
+    "DBMS_STATS"                  |
+    "DB_ROLE_CHANGE"              |
+    "DBTIMEZONE"                  |
+    "DB_UNIQUE_NAME"              |
+    "DB_VERSION"                  |
+    "DDL"                         |
+    "DEALLOCATE"                  |
+    "DEBUG"                       |
+    "DEBUGGER"                    |
+    "DEC"                         |
+    "DECIMAL"                     |
+    "DECLARE"                     |
+    "DECOMPOSE"                   |
+    "DECORRELATE"                 |
+    "DECR"                       |
+    "DECREMENT"                  |
+    "DECRYPT"                    |
+    "DEDUPLICATE"                |
+    "DEFAULT"                    |
+    "DEFAULTS"                   |
+    "DEFERRABLE"                 |
+    "DEFERRED"                   |
+    "DEFINED"                   |
+    "DEFINE"                    |
+    "DEFINER"                    |
+    "DEGREE"                     |
+    "DELAY"                      |
+    "DELEGATE"                  |
+    "DELETE_ALL"                  |
+    "DELETE"                       |
+    "DELETEXML"                     |
+    "DEMAND"                        |
+    "DENSE_RANKM"                   |
+    "DEPENDENT"                     |
+    "DEPTH"                         |
+    "DEQUEUE"                       |
+    "DEREF"                          |
+    "DEREF_NO_REWRITE"              |
+    "DESC"                  |
+    "DESTROY"                        |
+    "DETACHED"                       |
+    "DETERMINES"                     |
+    "DETERMINISTIC"                  |
+    "DICTIONARY"                     |
+    "DIMENSION"                       |
+    "DIMENSIONS"                        |
+    "DIRECT_LOAD"                       |
+    "DIRECTORY"                      |
+    "DIRECT_PATH"                       |
+    "DISABLE_ALL"                       |
+    "DISABLE"                       |
+    "DISABLE_PARALLEL_DML"              |
+    "DISABLE_PRESET"                    |
+    "DISABLE_RPKE"                    |
+    "DISALLOW"                      |
+    "DISASSOCIATE"                      |
+    "DISCARD"                      |
+    "DISCONNECT"                   |
+    "DISK"                        |
+    "DISKGROUP"                         |
+    "DISKS"                          |
+    "DISMOUNT"                         |
+    "DISTINCT"                         |
+    "DISTINGUISHED"                    |
+    "DISTRIBUTED"                     |
+    "DISTRIBUTE"                       |
+    "DML"                        |
+    "DML_UPDATE"                      |
+    "DOCFIDELITY"                     |
+    "DOCUMENT"                        |
+    "DOMAIN_INDEX_FILTER"               |
+    "DOMAIN_INDEX_NO_SORT"              |
+    "DOMAIN_INDEX_SORT"              |
+    "DOUBLE"                 |
+"DOWNGRADE"                         |
+"DRIVING_SITE"                      |
+"DROP_COLUMN"                      |
+"DROP"                        |
+"DROP_GROUP"                       |
+"DUMP"                       |
+"DUMPSET"                           |
+"DUPLICATE"                        |
+"DV"                         |
+"DYNAMIC"                           |
+"DYNAMIC_SAMPLING"                  |
+"DYNAMIC_SAMPLING_EST_CDN"          |
+"EACH"                           |
+"EDITIONABLE"                      |
+"EDITION"                       |
+"EDITIONING"                        |
+"EDITIONS"                        |
+"ELEMENT"                         |
+"ELIM_GROUPBY"                    |
+"ELIMINATE_JOIN"                    |
+"ELIMINATE_OBY"                    |
+"ELIMINATE_OUTER_JOIN"              |
+"ELSE"              |
+"ELSIF"             |
+"EM"                |
+"EMPTY_BLOB"                        |
+"EMPTY_CLOB"                        |
+"EMPTY"                        |
+"ENABLE_ALL"                        |
+"ENABLE"                          |
+"ENABLE_PARALLEL_DML"               |
+"ENABLE_PRESET"               |
+"ENCODING"                     |
+"ENCRYPT"                          |
+"ENCRYPTION"                        |
+"END"                       |
+"END_OUTLINE_DATA"                  |
+"ENFORCED"                  |
+"ENFORCE"                          |
+"ENQUEUE"                           |
+"ENTERPRISE"                        |
+"ENTITYESCAPING"                    |
+"ENTRY"                    |
+"EQUIPART"                          |
+"ERR"                          |
+"ERROR_ARGUMENT"                    |
+"ERROR"                    |
+"ERROR_ON_OVERLAP_TIME"             |
+"ERRORS"                     |
+"ESCAPE"                     |
+"ESTIMATE"                   |
+"EVAL"                       |
+"EVALNAME"                   |
+"EVALUATE"                   |
+"EVALUATION"                 |
+"EVENTS"                     |
+"EVERY"                      |
+"EXCEPT"                     |
+"EXCEPTION"                  |
+"EXCEPTION_INIT"             |
+"EXCEPTIONS"                |
+"EXCHANGE"                   |
+"EXCLUDE"                    |
+"EXCLUDING"                  |
+"EXCLUSIVE"                  |
+"EXECUTE"                    |
+"EXEMPT"                    |
+"EXISTING"                   |
+"EXISTS"                     |
+"EXISTSNODE"                 |
+"EXIT"                       |
+"EXPAND_GSET_TO_UNION"             |
+"EXPAND_TABLE"              |
+"EXP"                      |
+"EXPIRE"                          |
+"EXPLAIN"                         |
+"EXPLOSION"                       |
+"EXPORT"                         |
+"EXPR_CORR_CHECK"                |
+"EXTENDS"                   |
+"EXTENT"                           |
+"EXTENTS"                          |
+"EXTERNAL"                         |
+"EXTERNALLY"                       |
+"EXTRACTCLOBXML"                   |
+"EXTRACT"                    |
+"EXTRACTVALUE"              |
+"EXTRA"                      |
+"FACILITY"                |
+"FACT"                    |
+"FACTOR"                   |
+"FACTORIZE_JOIN"            |
+"FAILED"                |
+"FAILED_LOGIN_ATTEMPTS"        |
+"FAILGROUP"          |
+"FAILOVER"                     |
+"FAILURE"                      |
+"FALSE"                       |
+"FAMILY"                       |
+"FAR"                         |
+"FAST"                        |
+"FASTSTART"                   |
+"FBTSCAN"                     |
+"FEATURE_DETAILS"             |
+"FEATURE_ID"                |
+"FEATURE_SET"                    |
+"FEATURE_VALUE"                  |
+"FETCH"                  |
+"FILE"                          |
+"FILE_NAME_CONVERT"           |
+"FILESYSTEM_LIKE_LOGGING"        |
+"FILTER"              |
+"FINAL"               |
+"FINE"                |
+"FINISH"              |
+"FIRST"                  |
+"FIRSTM"                 |
+"FIRST_ROWS"                |
+"FIRST_VALUE"              |
+"FIXED_VIEW_DATA"           |
+"FLAGGER"                   |
+"FLASHBACK"                 |
+"FLASH_CACHE"              |
+"FLOAT"                     |
+"FLOB"                      |
+"FLOOR"                     |
+"FLUSH"                     |
+"FOLDER"                   |
+"FOLLOWING"                 |
+"FOLLOWS"                   |
+"FORCE"                     |
+"FOREIGN"                   |
+"FOREVER"                   |
+"FOR"                       |
+"FORMAT"                   |
+"FORWARD"                   |
+"FRAGMENT_NUMBER"           |
+"FREELIST"                  |
+"FREELISTS"               |
+"FREEPOOLS"                 |
+"FRESH"                     |
+"FROM"                      |
+"FROM_TZ"                   |
+"FULL"                      |
+"FULL_OUTER_JOIN_TO_OUTER"       |
+"FUNCTION"                    |
+"FUNCTIONS"                   |
+"GENERATED"                   |
+"GET"                      |
+"GLOBAL"                   |
+"GLOBALLY"                 |
+"GLOBAL_NAME"              |
+"GLOBAL_TOPIC_ENABLED"          |
+"GOTO"                |
+"GRANT"               |
+"GROUP_BY"            |
+"GROUP"               |
+"GROUP_ID"            |
+"GROUPING"                |
+"GROUPING_ID"             |
+"GROUPS"                  |
+"GUARANTEED"              |
+"GUARANTEE"               |
+"GUARD"                   |
+"HASH_AJ"                 |
+"HASH"                    |
+"HASHKEYS"                |
+"HASH_SJ"                 |
+"HAVING"                   |
+"HEADER"                   |
+"HEAP"                   |
+"HELP"                   |
+"HEXTORAW"                |
+"HEXTOREF"               |
+"HIDDEN_KEYWORD"           |
+"HIDE"                  |
+"HIERARCHY"             |
+"HIGH"                  |
+"HINTSET_BEGIN"                  |
+"HINTSET_END"                    |
+"HOT"                     |
+"HOUR"                    |
+"HWM_BROKERED"                 |
+"HYBRID"                    |
+"IDENTIFIED"                  |
+"IDENTIFIER"                  |
+"IDENTITY"                    |
+"IDGENERATORS"                |
+"ID"                    |
+"IDLE_TIME"                   |
+"IF"                       |
+"IGNORE"                          |
+"ILM"             |
+"IMMEDIATE"                 |
+"IMPACT"                     |
+"IMPORT"                     |
+"INACTIVE"                   |
+"INCLUDE"                    |
+"INCLUDE_VERSION"            |
+"INCLUDING"                 |
+"INCREMENTAL"                 |
+"INCREMENT"                    |
+"INCR"                       |
+"INDENT"                       |
+"INDEX_ASC"                    |
+"INDEX_DESC"                   |
+"INDEXED"                      |
+"INDEXES"                      |
+"INDEX_FFS"                    |
+"INDEX_FILTER"                 |
+"INDEX"                        |
+"INDEXING"                     |
+"INDEX_JOIN"                   |
+"INDEX_ROWS"                   |
+"INDEX_RRS"                    |
+"INDEX_RS_ASC"                |
+"INDEX_RS_DESC"                |
+"INDEX_RS"                     |
+"INDEX_SCAN"                   |
+"INDEX_SKIP_SCAN"              |
+"INDEX_SS_ASC"                |
+"INDEX_SS_DESC"                |
+"INDEX_SS"                     |
+"INDEX_STATS"                  |
+"INDEXTYPE"                    |
+"INDEXTYPES"                   |
+"INDICATOR"                    |
+"INDICES"                      |
+"INFINITE"                     |
+"INFORMATIONAL"                |
+"INHERIT"                      |
+"IN"                           |
+"INITCAP"                      |
+"INITIAL"                     |
+"INITIALIZED"                  |
+"INITIALLY"                    |
+"INITRANS"                     |
+"INLINE"                       |
+"INLINE_XMLTYPE_NT"            |
+"INMEMORY"                     |
+"IN_MEMORY_METADATA"           |
+"INMEMORY_PRUNING"             |
+"INNER"                        |
+"INOUT"                        |
+"INPLACE"                      |
+"INSERTCHILDXMLAFTER"          |
+"INSERTCHILDXMLBEFORE"         |
+"INSERTCHILDXML"               |
+"INSERT"                       |
+"INSERTXMLAFTER"               |
+"INSERTXMLBEFORE"              |
+"INSTANCE"                    |
+"INSTANCES"                    |
+"INSTANTIABLE"                 |
+"INSTANTLY"                    |
+"INSTEAD"                      |
+"INSTR2"                      |
+"INSTR4"                       |
+"INSTRB"                       |
+"INSTRC"                       |
+"INSTR"                        |
+"INTEGER"                      |
+"INTERLEAVED"                  |
+"INTERMEDIATE"                 |
+"INTERNAL_CONVERT"             |
+"INTERNAL_USE"                 |
+"INTERPRETED"                  |
+"INTERSECT"                    |
+"INTERVAL"                     |
+"INT"                          |
+"INTO"                         |
+"INVALIDATE"                   |
+"INVISIBLE"                    |
+"IN_XQUERY"                    |
+"IS"                         |
+"ISOLATION"                  |
+"ISOLATION_LEVEL"            |
+"ITERATE"                    |
+"ITERATION_NUMBER"           |
+"JAVA"                       |
+"JOB"                        |
+"JOIN"                       |
+"JSON_ARRAYAGG"              |
+"JSON_ARRAY"                 |
+"JSON_EQUAL"                 |
+"JSON_EXISTS2"               |
+"JSON_EXISTS"                |
+"JSONGET"                    |
+"JSON"                       |
+"JSON_OBJECTAGG"             |
+"JSON_OBJECT"                |
+"JSONPARSE"                  |
+"JSON_QUERY"                 |
+"JSON_SERIALIZE"             |
+"JSON_TABLE"                 |
+"JSON_TEXTCONTAINS2"         |
+"JSON_TEXTCONTAINS"          |
+"JSON_VALUE"                 |
+"KEEP_DUPLICATES"            |
+"KEEP"                       |
+"KERBEROS"                   |
+"KEY"                        |
+"KEY_LENGTH"                 |
+"KEYSIZE"                    |
+"KEYS"                       |
+"KEYSTORE"                   |
+"KILL"                       |
+"LABEL"                      |
+"LANGUAGE"                   |
+"LAST_DAY"                   |
+"LAST"                       |
+"LAST_VALUE"                 |
+"LATERAL"                    |
+"LAX"                        |
+"LAYER"                      |
+"LDAP_REGISTRATION_ENABLED"      |
+"LDAP_REGISTRATION"              |
+"LDAP_REG_SYNC_INTERVAL"         |
+"LEADING"                |
+"LEFT"                   |
+"LENGTH2"                |
+"LENGTH4"                |
+"LENGTHB"                |
+"LENGTHC"                |
+"LENGTH"                 |
+"LESS"                   |
+"LEVEL"                  |
+"LEVELS"                 |
+"LIBRARY"                |
+"LIFECYCLE"              |
+"LIFE"                   |
+"LIFETIME"               |
+"LIKE2"                  |
+"LIKE4"                  |
+"LIKEC"                  |
+"LIKE_EXPAND"            |
+"LIKE"                   |
+"LIMIT"                  |
+"LINEAR"                 |
+"LINK"                   |
+"LIST"                   |
+"LN"                     |
+"LNNVL"                  |
+"LOAD"                   |
+"LOB"                    |
+"LOBNVL"                 |
+"LOBS"                   |
+"LOCAL_INDEXES"          |
+"LOCAL"                  |
+"LOCALTIME"              |
+"LOCALTIMESTAMP"         |
+"LOCATION"               |
+"LOCATOR"                |
+"LOCKED"                 |
+"LOCKING"                |
+"LOCK"                   |
+"LOGFILE"                |
+"LOGFILES"               |
+"LOGGING"                |
+"LOGICAL"                |
+"LOGICAL_READS_PER_CALL"        |
+"LOGICAL_READS_PER_SESSION"     |
+"LOG"                |
+"LOGMINING"          |
+"LOGOFF"             |
+"LOGON"              |
+"LOG_READ_ONLY_VIOLATIONS"     |
+"LONG"               |
+"LOOP"               |
+"LOWER"              |
+"LOW"                |
+"LPAD"               |
+"LTRIM"              |
+"MAIN"              |
+"MAKE_REF"          |
+"MANAGED"           |
+"MANAGE"            |
+"MANAGEMENT"       |
+"MANAGER"           |
+"MANUAL"            |
+"MAP"               |
+"MAPPING"           |
+"MASTER"            |
+"MATCHED"           |
+"MATCHES"           |
+"MATCH"               |
+"MATCH_NUMBER"            |
+"MATCH_RECOGNIZE"          |
+"MATERIALIZED"             |
+"MATERIALIZE"              |
+"MAXARCHLOGS"              |
+"MAXDATAFILES"             |
+"MAXEXTENTS"               |
+"MAXIMIZE"                 |
+"MAXINSTANCES"             |
+"MAXLOGFILES"              |
+"MAXLOGHISTORY"            |
+"MAXLOGMEMBERS"                |
+"MAX_SHARED_TEMP_SIZE"         |
+"MAXSIZE"                      |
+"MAXTRANS"                     |
+"MAXVALUE"                     |
+"MEASURE"                      |
+"MEASURES"                     |
+"MEDIUM"                     |
+"MEMBER"                     |
+"MEMCOMPRESS"                |
+"MEMORY"                  |
+"MERGEACTIONS"           |
+"MERGE_AJ"                |
+"MERGE_CONST_ON"          |
+"MERGE"               |
+"MERGE_SJ"            |
+"METADATA"            |
+"METHOD"              |
+"MIGRATE"             |
+"MIGRATION"           |
+"MINEXTENTS"         |
+"MINIMIZE"            |
+"MINIMUM"             | 
+"MINING"              |
+"MINUS"               |
+"MINUS_NULL"          |
+"MINUTE"              |
+"MINVALUE"            |
+"MIRRORCOLD"          |
+"MIRRORHOT"           |
+"MIRROR"                    |
+"MLSLABEL"                  |
+"MODEL_COMPILE_SUBQUERY"       |
+"MODEL_DONTVERIFY_UNIQUENESS"  |
+"MODEL_DYNAMIC_SUBQUERY"   |
+"MODEL_MIN_ANALYSIS"       |
+"MODEL"                  |
+"MODEL_NB"               |
+"MODEL_NO_ANALYSIS"     |
+"MODEL_PBY"              |
+"MODEL_PUSH_REF"       |
+"MODEL_SV"               |
+"MODE"                       |
+"MODIFICATION"               |
+"MODIFY_COLUMN_TYPE"         |
+"MODIFY"               |
+"MOD"                  |
+"MODULE"               |
+"MONITORING"           |
+"MONITOR"              |
+"MONTH"                |
+"MONTHS_BETWEEN"      |
+"MONTHS"               |
+"MOUNT"                    |
+"MOUNTPATH"                |
+"MOVEMENT"                 |
+"MOVE"                     |
+"MULTIDIMENSIONAL"         |
+"MULTISET"                 |
+"MV_MERGE"                 |
+"NAMED"                    |
+"NAME"                     |
+"NAMESPACE"                |
+"NAN"                      |
+"NANVL"                    |
+"NATIONAL"                 |
+"NATIVE"                   |
+"NATURAL"                  |
+"NATURALN"                 |
+"NAV"                     |
+"NCHAR_CS"                 |
+"NCHAR"                    |
+"NCHR"                     |
+"NCLOB"                    |
+"NEEDED"                   |
+"NEG"                      |
+"NESTED"                   |
+"NETWORK"                  |
+"NEVER"                    |
+"NEW"                      |
+"NEW_TIME"                 |
+"NEXT_DAY"                 |
+"NEXT"                     |
+"NOCACHE"                      |
+"NOCOMPRESS"                   |
+"NOCOPY"                       |
+"NOCYCLE"                      |
+"NODELAY"                      |
+"NOENTITYESCAPING"             |
+"NOFORCE"               |
+"NOGUARANTEE"           |
+"NOKEEP"                |
+"NO_LOAD"               |
+"NOLOCAL"               |
+"NOLOGGING"             |
+"NOMAPPING"             |
+"NOMAXVALUE"            |
+"NO_MERGE"              |
+"NOMINIMIZE"            |
+"NOMINVALUE"            |
+"NOMONITORING"          |
+"NO_MONITOR"            |
+"NONBLOCKING"           |
+"NONEDITIONABLE"        |
+"NONE"               |
+"NO"                    |
+"NOREWRITE"             |
+"NORMAL"                |
+"NOSORT"                |
+"NOSWITCH"              |
+"NOTHING"               |
+"NOTIFICATION"          |
+"NOT"                   |
+"NOWAIT"                    |
+"NTH_VALUE"                 |
+"NULLIF"                    |
+"NULL_"                     |
+"NULLS"                        |
+"NUMBER"                       |
+"NUMERIC"                      |
+"NUM_INDEX_KEYS"              |
+"NUMTODSINTERVAL"              |
+"NUMTOYMINTERVAL"              |
+"NVARCHAR2"              |
+"NVL2"                   |
+"OBJECT2XML"             |
+"OBJECT"                 |
+"OBJ_ID"                   |
+"OBJNO"                     |
+"OBJNO_REUSE"               |
+"OCCURENCES"                |
+"OFFLINE"                   |
+"OFF"                |
+"OFFSET"             |
+"OF"                 |
+"OIDINDEX"           |
+"OID"                |
+"OLAP"               |
+"OLD"                |
+"OLD_PUSH_PRED"            |
+"OLS"                |
+"OLTP"                     |
+"OMIT"                    |
+"ONE"                      |
+"ONLINE"                   |
+"ONLINELOG"                |
+"ONLY"                     |
+"ON"                       |
+"OPAQUE"                   |
+"OPAQUE_TRANSFORM"         |
+"OPAQUE_XCANONICAL"        |
+"OPCODE"                |
+"OPEN"                     |
+"OPERATIONS"               |
+"OPERATOR"                 |
+"OPT_ESTIMATE"             |
+"OPTIMAL"                   |
+"OPTIMIZE"                     |
+"OPTIMIZER_FEATURES_ENABLE"    |
+"OPTIMIZER_GOAL"           |
+"OPTION"                   |
+"OPT_PARAM"                |
+"ORDERED"                  |
+"ORDERED_PREDICATES"       |
+"ORDER"                    |
+"ORDINALITY"               |
+"OR_EXPAND"                |
+"ORGANIZATION"             |
+"OR"                       |
+"OR_PREDICATES"            |
+"OSERROR"                  |
+"OTHER"                    |
+"OUTER_JOIN_TO_ANTI"       |
+"OUTER_JOIN_TO_INNER"      |
+"OUTER"                    |
+"OUTLINE_LEAF"             |
+"OUTLINE"                  |
+"OUT_OF_LINE"              |
+"OUT"                      |
+"OVERFLOW_NOMOVE"          |
+"OVERFLOW"                 |
+"OVERLAPS"                 |
+"OVER"                     |
+"OVERRIDING"               |
+"OWNER"                   |
+"OWNERSHIP"                    |
+"OWN"                    |
+"PACKAGE"                    |
+"PACKAGES"                     |
+"PARALLEL_ENABLE"              |
+"PARALLEL_INDEX"              |
+"PARALLEL"               |
+"PARAMETERFILE"            |
+"PARAMETERS"              |
+"PARAM"                   |
+"PARENT"                       |
+"PARITY"                       |
+"PARTIAL_JOIN"                 |
+"PARTIALLY"                 |
+"PARTIAL"                    |
+"PARTIAL_ROLLUP_PUSHDOWN"      |
+"PARTITION_HASH"      |
+"PARTITION_LIST"               |
+"PARTITION"               |
+"PARTITION_RANGE"             |
+"PARTITIONS"              |
+"PARTNUMINST"                 |
+"PASSING"                  |
+"PASSWORD_GRACE_TIME"          |
+"PASSWORD_LIFE_TIME"          |
+"PASSWORD_LOCK_TIME"           |
+"PASSWORD"           |
+"PASSWORD_REUSE_MAX"          |
+"PASSWORD_REUSE_TIME"          |
+"PASSWORD_VERIFY_FUNCTION"     |
+"PAST"                      |
+"PATCH"                     |
+"PATH"                      |
+"PATH_PREFIX"               |
+"PATHS"                     |
+"PATTERN"                   |
+"PBL_HS_BEGIN"              |
+"PBL_HS_END"                |
+"PCTFREE"                   |
+"PCTINCREASE"               |
+"PCTTHRESHOLD"              |
+"PCTUSED"                   |
+"PCTVERSION"                |
+"PENDING"                   |
+"PERCENT_KEYWORD"           |
+"PERCENT_RANKM"              |
+"PERFORMANCE"               |
+"PERIOD_KEYWORD"            |
+"PERMANENT"                 |
+"PERMISSION"                |
+"PERMUTE"                  |
+"PER"                       |
+"PFILE"                     |
+"PHYSICAL"                  |
+"PIKEY"                     |
+"PIPELINED"                 |
+"PIPE"                      |
+"PIV_GB"                    |
+"PIVOT"                     |
+"PIV_SSF"                   |
+"PLACE_DISTINCT"            |
+"PLACE_GROUP_BY"            |
+"PLAN"                      |
+"PLSCOPE_SETTINGS"          |
+"PLS_INTEGER"               |
+"PLSQL_CCFLAGS"             |
+"PLSQL_CODE_TYPE"           |
+"PLSQL_DEBUG"              |
+"PLSQL_OPTIMIZE_LEVEL"      |
+"PLSQL_WARNINGS"            |
+"PLUGGABLE"                 |
+"POINT"                     |
+"POLICY"                    |
+"POSITIVEN"                 |
+"POSITIVE"                  |
+"POST_TRANSACTION"          |
+"POWERMULTISET_BY_CARDINALITY"      |
+"POWERMULTISET"                |
+"POWER"                     |
+"PRAGMA"                    |
+"PREBUILT"                  |
+"PRECEDES"                  |
+"PRECEDING"                 |
+"PRECISION"                 |
+"PRECOMPUTE_SUBQUERY"         |
+"PREDICATE_REORDERS"          |
+"PRELOAD"                  |
+"PREPARE"                  |
+"PRESENTNNV"               |
+"PRESENT"                  |
+"PRESENTV"                 |
+"PRESERVE_OID"               |
+"PRESERVE"                   |
+"PRETTY"                     |
+"PREVIOUS"                   |
+"PREV"                      |
+"PRIMARY"                    |
+"PRINTBLOBTOCLOB"            |
+"PRIORITY"                   |
+"PRIOR"                      |
+"PRIVATE"                  |
+"PRIVATE_SGA"                |
+"PRIVILEGED"                |
+"PRIVILEGE"                  |
+"PRIVILEGES"                 |
+"PROCEDURAL"                 |
+"PROCEDURE"                  |
+"PROCESS"                    |
+"PROFILE"                    |
+"PROGRAM"                    |
+"PROJECT"                    |
+"PROPAGATE"                  |
+"PROTECTED"                  |
+"PROTECTION"                 |
+"PROXY"                    |
+"PRUNING"                   |
+"PUBLIC"                    |
+"PULL_PRED"                  |
+"PURGE"              |
+"PUSH_PRED"                 |
+"PUSH_SUBQ"           |
+"PX_FAULT_TOLERANCE"       |
+"PX_GRANULE"               |
+"PX_JOIN_FILTER"           |
+"QB_NAME"                 |
+"QUERY_BLOCK"                 |
+"QUERY"                   |
+"QUEUE_CURR"                 |
+"QUEUE"                   |
+"QUEUE_ROWP"                 |
+"QUIESCE"                    |
+"QUORUM"                     |
+"QUOTA"                      |
+"RAISE"                      |
+"RANDOM_LOCAL"               |
+"RANDOM"                     |
+"RANGE"                      |
+"RANKM"                      |
+"RAPIDLY"                    |
+"RAW"                     |
+"RAWTOHEX"                  |
+"RAWTONHEX"                 |
+"RBA"                       |
+"RBO_OUTLINE"               |
+"RDBA"                      |
+"READ"                      |
+"READS"                     |
+"REALM"                     |
+"REAL"                      |
+"REBALANCE"                 |
+"REBUILD"                   |
+"RECORD"                    |
+"RECORDS_PER_BLOCK"         |
+"RECOVERABLE"               |
+"RECOVER"                   |
+"RECOVERY"                  |
+"RECYCLEBIN"                |
+"RECYCLE"                   |
+"REDACTION"                 |
+"REDEFINE"                  |
+"REDO"                      |
+"REDUCED"                   |
+"REDUNDANCY"                   |
+"REF_CASCADE_CURSOR"           |
+"REFERENCED"               |
+"REFERENCE"                |
+"REFERENCES"               |
+"REFERENCING"              |
+"REF"                      |
+"REFRESH"                  |
+"REFTOHEX"                  |
+"REGEXP_COUNT"              |
+"REGEXP_INSTR"              |
+"REGEXP_LIKE"               |
+"REGEXP_REPLACE"            |
+"REGEXP_SUBSTR"             |
+"REGISTER"                 |
+"REGR_AVGX"                |
+"REGR_AVGY"                |
+"REGR_COUNT"               |
+"REGR_INTERCEPT"           |
+"REGR_R2"                  |
+"REGULAR"                  |
+"REJECT"                   |
+"REKEY"                   |
+"RELATIONAL"               |
+"RELIES_ON"                |
+"RELOCATE"                 |
+"RELY"                     |
+"REMAINDER"                |
+"REMOTE_MAPPED"            |
+"REMOVE"                   |
+"RENAME"                   |
+"REPAIR"                   |
+"REPEAT"                   |
+"REPLACE"                  |
+"REPLICATION"              |
+"REQUIRED"                 |
+"RESETLOGS"                |
+"RESET"                    |
+"RESIZE"                   |
+"RESOLVE"                  |
+"RESOLVER"                |
+"RESOURCE"          |
+"RESPECT"           |
+"RESTART"           |
+"RESTORE_AS_INTERVALS"           |
+"RESTORE"                       |
+"RESTRICT_ALL_REF_CONS"          |
+"RESTRICTED"            |
+"RESTRICT_REFERENCES"           |
+"RESTRICT"               |
+"RESULT"               |
+"RESUMABLE"            |
+"RESUME"               |
+"RETENTION"            |
+"RETRY_ON_ROW_CHANGE"           |
+"RETURNING"                |
+"RETURN"                   |
+"REUSE"                |
+"REVERSE"              |
+"REVOKE"               |
+"REWRITE_OR_ERROR"           |
+"REWRITE"                    |
+"RIGHT"                      |
+"ROLE"                      |
+"ROLESET"                    |
+"ROLES"                     |
+"ROLLBACK"                  |
+"ROLLING"                     |
+"ROLLUP"                     |
+"ROWDEPENDENCIES"             |
+"ROWID"                      |
+"ROW_LENGTH"                  |
+"ROWNUM"                      |
+"ROW"                       |
+"ROWS"                       |
+"RPAD"                         |
+"RTRIM"                        |
+"RULE"                         |
+"RULES"                       |
+"RUNNING"                    |
+"SALT"                        |
+"SAMPLE"                      |
+"SAVE_AS_INTERVALS"           |
+"SAVEPOINT"           |
+"SAVE"                        |
+"SB4"                        |
+"SCALE_ROWS"                    |
+"SCALE"                |
+"SCAN_INSTANCES"                |
+"SCAN"                     |
+"SCHEDULER"                 |
+"SCHEMACHECK"               |
+"SCHEMA"                 |
+"SCN_ASCENDING"              |
+"SCN"                        |
+"SCOPE"                     |
+"SCRUB"                     |
+"SD_ALL"                    |
+"SD_SHOW"                   |
+"SEARCH"                    |
+"SECOND"                    |
+"SECRET"                |
+"SECUREFILE_DBA"           |
+"SECUREFILE"               |
+"SECURITY"                 |
+"SEED"                     |
+"SEG_BLOCK"                 |
+"SEG_FILE"                 |
+"SEGMENT"                  |
+"SELECTIVITY"               |
+"SELECT"                    |
+"SELF"                    |
+"SEMIJOIN_DRIVER"           |
+"SEMIJOIN"                  |
+"SEMI_TO_INNER"             |
+"SEQUENCED"                 |
+"SEQUENCE"                  |
+"SEQUENTIAL"                |
+"SEQ"                       |
+"SERIALIZABLE"              |
+"SERIALLY_REUSABLE"         |
+"SERIAL"                    |
+"SERVERERROR"               |
+"SERVICE_NAME_CONVERT"      |
+"SERVICES"                  |
+"SESSION_CACHED_CURSORS"    |
+"SESSION"                   |
+"SESSIONS_PER_USER"         |
+"SESSIONTIMEZONE"           |
+"SESSIONTZNAME"             |
+"SET"                       |
+"SETS"                      |
+"SETTINGS"                  |
+"SET_TO_JOIN"               |
+"SEVERE"                    |
+"SHARED_POOL"               |
+"SHARED"                    |
+"SHARE"                     |
+"SHARING"                   |
+"SHELFLIFE"                 |
+"SHOW"                     |
+"SHRINK"                    |
+"SHUTDOWN"                  |
+"SIBLINGS"                  |
+"SID"                       |
+"SIGNAL_COMPONENT"          |
+"SIGNAL_FUNCTION"           |
+"SIGN"                      |
+"SIGNTYPE"                  |
+"SIMPLE_INTEGER"            |
+"SIMPLE"                    |
+"SINGLE"                    |
+"SINGLETASK"                |
+"SINH"                      |
+"SIN"                       |
+"SIZE"                          |
+"SKIP_EXT_OPTIMIZER"            |
+"SKIP_UNQ_UNUSABLE_IDX"         |
+"SKIP_UNUSABLE_INDEXES"         |
+"SMALLFILE"                  |
+"SMALLINT"                   |
+"SNAPSHOT"                   |
+"SOME"                       |
+"SORT"                       |
+"SOUNDEX"         |
+"SOURCE_FILE_DIRECTORY"         |
+"SOURCE_FILE_NAME_CONVERT"      |
+"SOURCE"                 |
+"SPACE_KEYWORD"                |
+"SPECIFICATION"                |
+"SPFILE"                        |
+"SPLIT"                        |
+"SPREADSHEET"                   |
+"SQLDATA"                     |
+"SQLERROR"                     |
+"SQLLDR"                        |
+"SQL"                     |
+"SQL_TRACE"                     |
+"SQL_TRANSLATION_PROFILE"       |
+"SQRT"                        |
+"STALE"                   |
+"STANDALONE"               |
+    "STANDARD_HASH"         |
+    "STANDBY_MAX_DATA_DELAY"       |
+    "STANDBYS"                      |
+    "STANDBY"                       |
+    "STAR"            |
+    "STAR_TRANSFORMATION"           |
+    "START"                        |
+    "STARTUP"                   |
+    "STATEMENT_ID"                   |
+    "STATEMENT_QUEUING"              |
+    "STATEMENTS"                     |
+    "STATEMENT"                      |
+    "STATE"                         |
+    "STATIC"                     |
+    "STATISTICS"                     |
+    "STDDEV_POP"                    |
+    "STDDEV_SAMP"                |
+    "STOP"                        |
+    "STORAGE"                      |
+    "STORE"                        |
+    "STREAMS"                       |
+    "STREAM"                        |
+    "STRICT"                         |
+    "STRING"                        |
+    "STRIPE_COLUMNS"                 |
+    "STRIPE_WIDTH"                  |
+    "STRIP"                      |
+    "STRUCTURE"                    |
+    "SUBMULTISET"               |
+    "SUBPARTITION_REL"               |
+    "SUBPARTITIONS"                  |
+    "SUBPARTITION"                   |
+    "SUBQUERIES"             |
+    "SUBQUERY_PRUNING"               |
+    "SUBSCRIBE"                      |
+    "SUBSET"                  |
+    "SUBSTITUTABLE"                  |
+    "SUBSTR2"                        |
+    "SUBSTR4"                        |
+    "SUBSTRB"                        |
+    "SUBSTRC"                        |
+    "SUBTYPE"                     |
+    "SUCCESSFUL"                     |
+    "SUCCESS"                        |
+    "SUMMARY"                   |
+    "SUPPLEMENTAL"                   |
+    "SUSPEND"               |
+    "SWAP_JOIN_INPUTS"               |
+    "SWITCHOVER"                     |
+    "SWITCH"                    |
+    "SYNCHRONOUS"                   |
+    "SYNC"                        |
+    "SYNONYM"                        |
+    "SYSASM"                         |
+    "SYS_AUDIT"                      |
+    "SYSAUX"                      |
+    "SYSBACKUP"                   |
+    "SYS_CONTEXT"                |
+    "SYSDATE"                 |
+    "SYSDBA"                     |
+    "SYSDG"                      |
+    "SYS_MKXTI"                     |
+    "SYSOBJ"                        |
+    "SYSOPER"                      |
+    "SYS_SYNRCIREDO"                |
+    "SYSTEM_DEFINED"               |
+    "SYSTEM"                        |
+    "TABLE_LOOKUP_BY_NL"            |
+    "TABLESPACE_NO"            |
+    "TABLESPACE"          |
+    "TABLES"              |
+    "TABLE_STATS"         |
+    "TABLE"               |
+    "TABNO"               |
+    "TAG"                 |
+    "TANH"                |
+    "TAN"                 |
+    "TEMPFILE"            |
+    "TEMPLATE"            |
+    "TEMPORARY"           |
+    "TEMP_TABLE"          |
+    "TEST"                |
+    "TEXT"                |
+    "THAN"                |
+    "THEN"                |
+    "THE"                |
+    "THREAD"                 |
+    "THROUGH"                |
+    "TIER"                   |
+    "TIES"                  |
+    "TIMEOUT"                |
+    "TIMESTAMP"              |
+    "TIMES"                  |
+    "TIME"                   |
+    "TIMEZONE"               |
+    "TIMEZONE_ABBR"          |
+    "TIMEZONE_HOUR"          |
+    "TIMEZONE_MINUTE"        |
+    "TIMEZONE_OFFSET"        |
+    "TIMEZONE_REGION"        |
+    "TIME_ZONE"              |
+    "TO_ACLID"               |
+    "TO_DSINTERVAL"          |
+    "TO_LOB"                 |
+    "TO_MULTI_BYTE"          |
+    "TO_NCHAR"               |
+    "TO_NCLOB"              |
+    "TO_NUMBER"              |
+    "TOPLEVEL"               |
+    "TO_TIME"                |
+    "TO"                     |
+    "TRACE"                  |
+    "TRACING"                |
+    "TRACKING"               |
+    "TRAILING"               |
+    "TRANSACTION"            |
+    "TRANSITIONAL"           |
+    "TRANSITION"             |
+    "TRANSLATE"             |
+    "TRANSLATION"           |
+    "TREAT"                  |
+    "TRIGGERS"               |
+    "TRIGGER"                |
+    "TRUE"                   |
+    "TRUNCATE"               |
+    "TRUNC"                  |
+    "TRUSTED"                |
+    "TRUST"                |
+    "TUNING"                |
+    "TX"                     |
+    "TYPES"                  |
+    "TYPE"                   |
+    "UB2"                     |
+    "UBA"                     |
+    "UCS2"                    |
+    "UID"                     |
+    "UNARCHIVED"               |
+    "UNBOUNDED"               |
+    "UNBOUND"                  |
+    "UNCONDITIONAL"             |
+    "UNDER"                    |
+    "UNDO"                    |
+    "UNDROP"                    |
+    "UNIFORM"                    |
+    "UNION"                    |
+    "UNIQUE"                     |
+    "UNISTR"                  |
+    "UNLIMITED"               |
+    "UNLOAD"                   |
+    "UNLOCK"                   |
+    "UNRESTRICTED"             |
+    "UNSUBSCRIBE"               |
+    "UNTIL"                     |
+    "UNUSABLE"                 |
+    "UNUSED"                   |
+    "UPDATABLE"             |
+    "UPDATED"                 |
+    "UPDATE"                 |
+    "UPDATEXML"               |
+    "UPD_INDEXES"            |
+    "UPD_JOININDEX"           |
+    "UPGRADE"                 |
+    "UPPER"                   |
+    "UPSERT"                  |
+    "UROWID"                  |
+    "USABLE"                  |
+    "USAGE"                  |
+    "USE_ANTI"                |
+    "USE_CONCAT"              |
+    "USE_CUBE"                    |
+    "USE_HASH"                  |
+    "USE_MERGE_CARTESIAN"              |
+    "USE_MERGE"               |
+    "USE_NL"                  |
+    "USER_DATA"               |
+    "USER_DEFINED"                  |
+    "USERENV"                |
+    "USERGROUP"               |
+    "USER_RECYCLEBIN"               |
+    "USERS"                  |
+    "USER_TABLESPACES"               |
+    "USER"                    |
+    "USE"                |
+    "USING"            |
+    "UTF16BE"                |
+    "UTF16LE"                |
+    "UTF32"               |
+    "UTF8"                |
+    "V1"                    |
+    "V2"                   |
+    "VALIDATE"                |
+    "VALIDATION"              |
+    "VALID_TIME_END"         |
+    "VALUES"             |
+    "VALUE"                |
+    "VARCHAR2"              |
+    "VARCHAR"                |
+    "VARIABLE"               |
+    "VAR_POP"                 |
+    "VARRAYS"                 |
+    "VARRAY"                 |
+    "VAR_SAMP"                |
+    "VARYING"                 |
+    "VECTOR_READ_TRACE"              |
+    "VECTOR_READ"                     |
+    "VECTOR_TRANSFORM_DIMS"           |
+    "VECTOR_TRANSFORM_FACT"            |
+    "VECTOR_TRANSFORM"                 |
+    "VERIFIER"                        |
+    "VERIFY"                 |
+    "VERSIONS"               |
+    "VERSIONS_XID"              |
+    "VERSION"                |
+    "VIEW"                   |
+    "VIOLATION"              |
+    "VIRTUAL"               |
+    "VISIBILITY"             |
+    "VISIBLE"                |
+    "VOLUME"               |
+    "VSIZE"                 |
+    "WAIT"                  |
+    "WALLET"                 |
+    "WARNING"               |
+    "WEEKS"                 |
+    "WEEK"                  |
+    "WELLFORMED"                  |
+    "WHENEVER"              |
+    "WHEN"                   |
+    "WHERE"                  |
+    "WHILE"             |
+    "WHITESPACE"              |
+    "WIDTH_BUCKET"             |
+    "WITHIN"                 |
+    "WITHOUT"                |
+    "WITH_PLSQL"             |
+    "WITH"                   |
+    "WORK"                   |
+    "WRAPPED"                |
+    "WRAPPER"                |
+    "WRITE"                  |
+    "XTRANSPORT"             |
+    "YEARS"                  |
+    "YEAR"                  |
+    "YES"                   |
+    "YMINTERVAL_UNCONSTRAINED"          |
+    "ZONEMAP"                   |
+    "ZONE"                       |
+    "PREDICTION"                |
+    "PREDICTION_BOUNDS"                |
+    "PREDICTION_COST"                 |
+    "PREDICTION_DETAILS"                |
+    "PREDICTION_PROBABILITY"            |
+    "PREDICTION_SET"                    |
+    "CUME_DIST"                  |
+    "DENSE_RANK"                 |
+    "LISTAGG"                |
+    "PERCENT_RANK"             |
+    "PERCENTILE_CONT"             |
+    "PERCENTILE_DISC"             |
+    "RANK"                  |
+    "AVG"                          |
+    "CORR"                         |
+    "COVAR_"                       |
+    "DECODE"                       |
+    "LAG"                         |
+    "LEAD"                         |
+    "MAX"                          |
+    "MEDIAN"                       |
+    "MIN"                          |
+    "NTILE"                        |
+    "NVL"                          |
+    "RATIO_TO_REPORT"              |
+    "REGR_"                        |
+    "ROUND"                        |
+    "ROW_NUMBER"                   |
+    "SUBSTR"                       |
+    "TO_CHAR"                     |
+    "TRIM"                         |
+    "SUM"                          |
+    "STDDEV"                       |
+    "VAR_"                         |
+    "VARIANCE"                     |
+    "LEAST"                        |
+    "GREATEST"                     |
+    "TO_DATE"                                       
+%%
+
+
+<YYINITIAL> { 
+    {Reserved}                     { tok = token(TokenType.KEYWORD); return symbol (Sym.KEYWORD, yytext()); }
+
+/* operators */
+  "("                            |
+  ")"                            |
+  "{"                            |
+  "}"                            |
+  "["                            |
+  "]"                            |
+  ";"                            |
+  ","                            |
+  "."                            |
+  ".."                            |
+  "@"                            |
+  "="                            |
+  ">"                            |
+  "<"                            |
+  "!"                            |
+  "~"                            |
+  "?"                            |
+  "%"                            |
+  "&"                            |
+  "**"                           |
+  "*"                            |
+  "/"                            |
+  "-"                            |
+  "+"                            |
+  "!="                           |
+  "<>"                           |
+  "^="                           |
+  "~="                           |
+  "^"                            |
+  ":"                            |
+  "|"                            |
+  "_"                            |
+  ":="                           { tok = token(TokenType.OPERATOR); return symbol (Sym.OPERATOR, yytext()); }
+
+/* string literal */
+  \"                             {
+                                    yybegin(DQ_STRING);
+                                    tokenStart = yychar;
+                                    tokenLength = 1;
+                                 }
+  \'                             {
+                                    yybegin(SQ_STRING);
+                                    tokenStart = yychar;
+                                    tokenLength = 1;
+                                 }
+
+  /* numeric literals */
+
+  {DecIntegerLiteral}            |
+
+  {FloatLiteral}                 { tok = token(TokenType.NUMBER); return symbol (Sym.NUMBER, yytext()); }
+
+  /* comments */
+  {Comment}                      { tok = token(TokenType.COMMENT); return symbol (Sym.COMMENT),  yytext()); }
+
+  /* whitespace */
+  {WhiteSpace}+                  { /* skip */ }
+
+  /* identifiers */
+  {Identifier}                   { tok = token(TokenType.IDENTIFIER); return symbol (Sym.IDENTIFIER, yytext()); }
+
+}
+
+<DQ_STRING> {
+  {StringCharacter}+             { tokenLength += yylength(); }
+  \"\"                           { tokenLength += 2; }
+  \\.                            { tokenLength += 2; }
+  {LineTerminator}               { yybegin(YYINITIAL);  }
+  \"                             {
+                                     yybegin(YYINITIAL);
+                                     // length also includes the trailing quote
+                                     tok = token(TokenType.STRING, tokenStart, tokenLength + 1);
+                                     return symbol (Sym.STRING, yytext()); 
+                                 }
+}
+
+<SQ_STRING> {
+  {SingleCharacter}+             { tokenLength += yylength(); }
+  \'\'                           { tokenLength += 2; }
+  \\.                            { tokenLength += 2; }
+  {LineTerminator}               { yybegin(YYINITIAL);  }
+  \'                             {
+                                     yybegin(YYINITIAL);
+                                     // length also includes the trailing quote
+                                     tok = token(TokenType.STRING, tokenStart, tokenLength + 1);
+                                     return symbol (Sym.STRING, yytext()); 
+                                 }
+}
+
+/* error fallback */
+<<EOF>>                          { return null; }   
+
+[^]   { throw new Error("Illegal character <" + yytext() + "> at line " + yyline);  }

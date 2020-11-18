@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="myDsl" nsURI="http://www.MyDsl.mydsl" nsPrefix="myDsl">
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Element" upperBound="-1"
+        eType="#//Element" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Element"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SELECT" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="x" eType="#//FromAndWhereClauses"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FromAndWhereClauses">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" eType="#//TableName"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="z" upperBound="-1" eType="#//WHERE"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="WHERE">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sign" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Oper" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Oper1">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Oper2">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Oper3">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="val" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DATABASE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CREATE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tables" upperBound="-1"
+        eType="#//TABLE" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TABLE">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" upperBound="-1"
+        eType="#//TableName" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
+        eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TableName">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CD">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//DATATYPE"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="notNull" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PrimaryKey">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columnAsPK" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ForeignKey">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columnAsFK" unique="false"
+        upperBound="-1" eType="#//CD"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="foreignTable" eType="#//TABLE"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="foreignColumns" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DROPTABLE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" unique="false" upperBound="-1"
+        eType="#//TableName"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TRUNCATE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" unique="false" upperBound="-1"
+        eType="#//TableName"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DELETE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="x" eType="#//FromAndWhereClauses"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="UPDATE" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" unique="false" upperBound="-1"
+        eType="#//TableName"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sc" upperBound="-1" eType="#//SetClause"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="z" upperBound="-1" eType="#//WHERE"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SetClause">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="val" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ALTER" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" unique="false" upperBound="-1"
+        eType="#//TableName"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="addDropUpdate" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ALTERDROP">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ALTERADD">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ALTERUPDATE">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VariableDeclaration" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IntLiteral">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="val" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RealLiteral">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="val" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IntVarExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="var" eType="#//VariableDeclaration"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SELECTFUNCT" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//CD"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="x" eType="#//FromAndWhereClauses"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CountFunction" eSuperTypes="#//SELECTFUNCT"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AvgFunction" eSuperTypes="#//SELECTFUNCT"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SumFunction" eSuperTypes="#//SELECTFUNCT"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MinFunction" eSuperTypes="#//SELECTFUNCT"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MaxFunction" eSuperTypes="#//SELECTFUNCT"/>
+  <eClassifiers xsi:type="ecore:EClass" name="INSERT" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nameT" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="literals" unique="false"
+        upperBound="-1" eType="#//DATATYPE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DATATYPE">
+    <eLiterals name="VARCHAR" literal="VARCHAR"/>
+    <eLiterals name="CHAR" value="1" literal="char"/>
+    <eLiterals name="DATE" value="2" literal="date"/>
+    <eLiterals name="INT" value="3" literal="int"/>
+    <eLiterals name="FLOAT" value="4" literal="float"/>
+    <eLiterals name="TIME" value="5" literal="time"/>
+    <eLiterals name="TEXT" value="6" literal="text"/>
+  </eClassifiers>
+</ecore:EPackage>
